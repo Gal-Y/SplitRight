@@ -1,0 +1,85 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: splitright-backend
+  labels:
+    app: splitright
+    tier: backend
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: splitright
+      tier: backend
+  template:
+    metadata:
+      labels:
+        app: splitright
+        tier: backend
+    spec:
+      containers:
+        - name: splitright-backend
+          image: splitright-backend:latest
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 5000
+          resources:
+            requests:
+              cpu: 100m
+              memory: 128Mi
+            limits:
+              cpu: 500m
+              memory: 256Mi
+          readinessProbe:
+            httpGet:
+              path: /api/health
+              port: 5000
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /api/health
+              port: 5000
+            initialDelaySeconds: 15
+            periodSeconds: 20
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: splitright-backend
+  labels:
+    app: splitright
+    tier: backend
+spec:
+  selector:
+    app: splitright
+    tier: backend
+  ports:
+    - port: 80
+      targetPort: 5000
+  type: ClusterIP
+---
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: splitright-backend-hpa
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: splitright-backend
+  minReplicas: 1
+  maxReplicas: 10
+  metrics:
+    - type: Resource
+      resource:
+        name: cpu
+        target:
+          type: Utilization
+          averageUtilization: 50
+    - type: Resource
+      resource:
+        name: memory
+        target:
+          type: Utilization
+          averageUtilization: 50
