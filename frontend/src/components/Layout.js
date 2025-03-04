@@ -105,7 +105,7 @@ const Layout = ({ children }) => {
             color="inherit"
             aria-label="github"
             component="a"
-            href="https://github.com"
+            href="https://github.com/Gal-Y/SplitRight"
             target="_blank"
             rel="noopener noreferrer"
           >
