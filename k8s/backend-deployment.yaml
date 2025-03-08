@@ -17,10 +17,12 @@ spec:
         app: splitright
         tier: backend
     spec:
+      imagePullSecrets:
+        - name: ecr-secret
       containers:
         - name: splitright-backend
-          image: splitright-backend:latest
-          imagePullPolicy: IfNotPresent
+          image: 324037286174.dkr.ecr.ap-southeast-2.amazonaws.com/splitright-backend:latest
+          imagePullPolicy: Always
           ports:
             - containerPort: 5000
           resources:

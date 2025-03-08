@@ -2,7 +2,7 @@ import axios from 'axios';
 import localStorageService from './localStorageService';
 
 // Configuration
-const API_BASE_URL = process.env.REACT_APP_API_URL || '/api';
+const API_BASE_URL = '/api';
 const USE_LOCAL_STORAGE = process.env.REACT_APP_USE_LOCAL_STORAGE === 'true' || false;
 
 // Helper to determine if we should use localStorage or API
@@ -173,15 +173,19 @@ export const getSettlements = async (groupId) => {
 
 // Load Generator for Kubernetes autoscaling demo
 export const generateLoad = async (intensity = 1, duration = 10) => {
-  try {
+  if (shouldUseLocalStorage()) {
+    return localStorageService.generateLoad(intensity, duration);
+  } else {
+    console.log('API URL being used:', API_BASE_URL);
+    console.log('Sending Load Test: ', {intensity, duration});
+    // Increase timeout to 30 seconds (30000ms) for load test requests
     const response = await axios.post(`${API_BASE_URL}/load-test`, {
-      intensity, // 1-10 scale for load intensity
-      duration   // seconds to run the load test
+      intensity,
+      duration
+    }, {
+      timeout: 30000 // 30 seconds timeout
     });
     return response.data;
-  } catch (error) {
-    console.error('Error generating load:', error);
-    return { success: false, error: error.message };
   }
 };
 

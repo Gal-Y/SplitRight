@@ -19,13 +19,13 @@ spec:
     spec:
       containers:
         - name: splitright-frontend
-          image: splitright-frontend:latest
-          imagePullPolicy: IfNotPresent
+          image: 324037286174.dkr.ecr.ap-southeast-2.amazonaws.com/splitright-frontend:latest
+          imagePullPolicy: Always
           ports:
             - containerPort: 80
           env:
             - name: REACT_APP_API_URL
-              value: "http://splitright-backend"
+              value: "http://splitright-backend.default.svc.cluster.local"
           resources:
             requests:
               cpu: 100m

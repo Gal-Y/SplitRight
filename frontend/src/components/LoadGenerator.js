@@ -55,11 +55,22 @@ const LoadGenerator = () => {
     setError(null);
 
     try {
+      // Add a longer timeout for the load test request (30 seconds)
       const response = await apiService.generateLoad(intensity, duration);
-      setResult(response);
+      
+      // Check if response exists and has the required properties
+      if (response && typeof response === 'object') {
+        setResult({
+          message: response.message || 'Load generated successfully',
+          operations: response.operations || 0,
+          duration: parseFloat(response.duration || 0)
+        });
+      } else {
+        throw new Error('Invalid response format');
+      }
     } catch (err) {
-      setError('Failed to generate load. Make sure the backend is running.');
       console.error('Load generation error:', err);
+      setError(`Failed to generate load: ${err.message || 'Unknown error'}`);
     } finally {
       setLoading(false);
     }
